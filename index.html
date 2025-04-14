@@ -289,7 +289,7 @@
                         data-info="Damage: 20-21 | Cooldown: 1s | Splash damage with slows">
                         <i class="bi bi-question-circle-fill"></i>
                     </button>
-                    <span class="tower-type type-mixed">Air &amp; Ground</span>
+                    <span class="tower-type type-mixed">Air &amp; Ground | <strong>SLOW</strong></span>
                 </div>
             </div>
         </div>
@@ -472,7 +472,7 @@
                         data-info="Damage: 30-35 | Cooldown: 0.5s | 50% slow poison over 2 seconds">
                         <i class="bi bi-question-circle-fill"></i>
                     </button>
-                    <span class="tower-type type-mixed">Air &amp; Ground</span>
+                    <span class="tower-type type-mixed">Air &amp; Ground | <strong>SLOW</strong></span>
                 </div>
             </div>
         </div>
@@ -536,7 +536,7 @@
                         data-info="Damage: 115 | Cooldown: 1.5s | Splash damage and 60 DPS immolation">
                         <i class="bi bi-question-circle-fill"></i>
                     </button>
-                    <span class="tower-type type-mixed">Air &amp; Ground</span>
+                    <span class="tower-type type-mixed">Air &amp; Ground | <strong>DPS</strong></span>
                 </div>
             </div>
         </div>
@@ -658,7 +658,7 @@
                         data-info="Damage: 100 | Cooldown: 1s | 400 Splash damage with slows">
                         <i class="bi bi-question-circle-fill"></i>
                     </button>
-                    <span class="tower-type type-mixed">Air &amp; Ground</span>
+                    <span class="tower-type type-mixed">Air &amp; Ground | <strong>SLOW</strong></span>
                 </div>
             </div>
         </div>
@@ -841,7 +841,7 @@
                         data-info="Damage: 150-175 | Cooldown: 0.75s | 10% chance for 5x damage. Ground only.">
                         <i class="bi bi-question-circle-fill"></i>
                     </button>
-                    <span class="tower-type type-ground">Ground</span>
+                    <span class="tower-type type-ground">Ground | <strong>10% CRIT 9x</strong></span>
                 </div>
             </div>
         </div>
@@ -1088,7 +1088,7 @@
                         data-info="Damage: (kills × 5-120) + (lvl × 50) | Cooldown: 2.5s | Holds units for 2.5s, -12 armor">
                         <i class="bi bi-question-circle-fill"></i>
                     </button>
-                    <span class="tower-type type-mixed">Air &amp; Ground</span>
+                    <span class="tower-type type-mixed">Air &amp; Ground | <strong>STUN</strong></span>
                 </div>
             </div>
         </div>
@@ -1514,7 +1514,68 @@
                 </div>
             </div>
         </div>
-        
+
+        <!-- Spell Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Flawed Diamond -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Diamond</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-diamond.png" alt="FD" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Amethyst -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Amethyst</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-amethyst.png" alt="FA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Aquamarine -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Aquamarine</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-aquamarine.png" alt="NA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Spell Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Spell</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/spell-slate.png" alt="SS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 30-40 | Cooldown: 0.5s | 30% chance for 75 dmg spells">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-mixed">Air & Ground</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Poison Slate -->
         <div class="gem-row">
             <div class="d-flex flex-wrap">
@@ -1580,67 +1641,6 @@
                         <i class="bi bi-question-circle-fill"></i>
                     </button>
                     <span class="tower-type type-mixed">Air &amp; Ground</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Spell Slate -->
-        <div class="gem-row">
-            <div class="d-flex flex-wrap">
-                <!-- Flawed Diamond -->
-                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
-                    <div class="gem-text">
-                        <span class="gem-quality">Flawed</span>
-                        <span class="gem-name">Diamond</span>
-                    </div>
-                    <div class="gem-img" style="background-color: white;">
-                        <img src="img/flawed-diamond.png" alt="FD" style="width: 90%; height: 90%; object-fit: contain;">
-                    </div>
-                </div>
-                
-                <!-- Flawed Amethyst -->
-                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
-                    <div class="gem-text">
-                        <span class="gem-quality">Flawed</span>
-                        <span class="gem-name">Amethyst</span>
-                    </div>
-                    <div class="gem-img" style="background-color: white;">
-                        <img src="img/flawed-amethyst.png" alt="FA" style="width: 90%; height: 90%; object-fit: contain;">
-                    </div>
-                </div>
-                
-                <!-- Normal Aquamarine -->
-                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
-                    <div class="gem-text">
-                        <span class="gem-quality">Normal</span>
-                        <span class="gem-name">Aquamarine</span>
-                    </div>
-                    <div class="gem-img" style="background-color: white;">
-                        <img src="img/normal-aquamarine.png" alt="NA" style="width: 90%; height: 90%; object-fit: contain;">
-                    </div>
-                </div>
-                
-                <!-- Spacer -->
-                <div class="spacer"></div>
-                
-                <!-- Spell Slate -->
-                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
-                    <div class="gem-text">
-                        <span class="gem-quality">Spell</span>
-                        <span class="gem-name">Slate</span>
-                    </div>
-                    <div class="gem-img" style="background-color: white;">
-                        <img src="img/spell-slate.png" alt="SS" style="width: 90%; height: 90%; object-fit: contain;">
-                    </div>
-                </div>
-                
-                <!-- Info -->
-                <div class="info-cell">
-                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
-                        data-info="Damage: 30-40 | Cooldown: 0.5s | 30% chance for 75 dmg spells">
-                        <i class="bi bi-question-circle-fill"></i>
-                    </button>
-                    <span class="tower-type type-mixed">Air & Ground</span>
                 </div>
             </div>
         </div>
