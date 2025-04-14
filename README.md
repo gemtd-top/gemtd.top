@@ -4,7 +4,7 @@ An interactive web-based tool to help players of Gem TD+ (a Warcraft III custom 
 
 ## 🎮 [Try it out](https://yourusername.github.io/gemtd-helper/)
 
-![Gem TD+ Helper Screenshot](img/screenshot.png)
+![Gem TD+ Helper Screenshot](inc/screenshot.jpg)
 
 ## Features
 
