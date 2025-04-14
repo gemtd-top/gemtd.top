@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gem TD Helper</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <meta name="description" content="Interactive helper for Gem TD+, the popular tower defense game. Track gems, plan combinations, and view tower stats.">
+    <meta name="keywords" content="Gem TD+, Gem TD, Tower Defense, Warcraft III, Custom Map, Gem Combinations, TD Guide">
+    <meta name="author" content="GEM TD Fan">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta property="og:title" content="Gem TD+ Helper">
+    <meta property="og:description" content="Interactive helper for tracking gems and tower combinations in Gem TD+">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/inc/gem-td-thumbnail.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <!-- Bootstrap 5 CSS -->
+    <link href="inc/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <style>
+        body {
+            padding: 15px;
+        }
+        
+        .gem-cell {
+            width: 150px;
+            height: 60px;
+            cursor: pointer;
+            border: 1px solid #dee2e6;
+            transition: all 0.2s;
+            display: flex;
+            padding: 0;
+            align-items: center;
+            border-radius: 3px;
+            margin: 2px;
+        }
+        
+        .gem-cell.acquired {
+            background-color: rgba(40, 167, 69, 0.2);
+            border-color: #28a745;
+        }
+        
+        .gem-img {
+            width: 40px;
+            height: 40px;
+            background-color: black;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 3px;
+            color: black;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
+        
+        .gem-text {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding-left: 3px;
+        }
+        
+        .gem-quality {
+            font-size: 0.7rem;
+            color: #6c757d;
+        }
+        
+        .gem-name {
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .result-gem .gem-quality,
+        .result-gem .gem-name {
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .section-title {
+            background-color: #343a40;
+            color: white;
+            padding: 5px 10px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        
+        .info-cell {
+            width: 150px;
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 2px;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            padding: 0;
+        }
+        
+        .tower-type {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-top: 3px;
+        }
+        
+        .type-air {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+        
+        .type-ground {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .type-mixed {
+            background-color: #fff3cd;
+            color: #664d03;
+        }
+        
+        /* Gem colors for images */
+        .diamond-img { background-color: #b9f2ff; color: #000; }
+        .ruby-img { background-color: #e0115f; }
+        .sapphire-img { background-color: #0f52ba; }
+        .emerald-img { background-color: #046307; }
+        .topaz-img { background-color: #ffc87c; color: #000; }
+        .opal-img { background-color: #a8c3bc; color: #000; }
+        .aquamarine-img { background-color: #7fffd4; color: #000; }
+        .amethyst-img { background-color: #9966cc; }
+        
+        /* Slate image colors */
+        .air-slate-img { background-color: #87ceeb; color: #000; }
+        .hold-slate-img { background-color: #8b4513; }
+        .slow-slate-img { background-color: #4682b4; }
+        .opal-vein-slate-img { background-color: #e6e6fa; color: #000; }
+        .poison-slate-img { background-color: #556b2f; }
+        .spell-slate-img { background-color: #9932cc; }
+        .range-slate-img { background-color: #cd5c5c; }
+        .damage-slate-img { background-color: #b22222; }
+        .ancient-slate-img { background-color: #696969; }
+        .wraith-slate-img { background-color: #483d8b; }
+        .elder-slate-img { background-color: #8b008b; }
+        .viper-slate-img { background-color: #006400; }
+        
+        /* Special gem image colors */
+        .silver-img { background-color: #c0c0c0; color: #000; }
+        .malachite-img { background-color: #0bda51; color: #000; }
+        .star-ruby-img { background-color: #e0115f; }
+        .jade-img { background-color: #00a36c; }
+        .blood-stone-img { background-color: #800000; }
+        .red-crystal-img { background-color: #ff0000; }
+        .dark-emerald-img { background-color: #046307; }
+        .yellow-sapphire-img { background-color: #ffc000; color: #000; }
+        .pink-diamond-img { background-color: #ff69b4; color: #000; }
+        .uranium-img { background-color: #35f361; color: #000; }
+        .gold-img { background-color: #ffd700; color: #000; }
+        .black-opal-img { background-color: #2d383a; }
+        .paraiba-img { background-color: #42c0fb; color: #000; }
+
+        .gem-row {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+        
+        .gem-row:last-child {
+            border-bottom: none;
+        }
+        
+        .spacer {
+            width: 150px;
+            height: 60px;
+            margin: 2px;
+        }
+        /* Style for the icon */
+        .bi-question-circle-fill {
+          display: inline-block;
+          width: 1.3em;
+          height: 1.3em;
+          vertical-align: -0.3em;
+          background-image: url('inc/bi-question-circle-fill.svg');
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: contain;
+        }
+        
+        /* Media queries for responsive layout */
+        @media (min-width: 1200px) {
+            #maze-container {
+                position: fixed;
+                right: 2%;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 30%;
+                max-width: 650px;
+                z-index: 100;
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+                border: 1px solid rgba(0, 0, 0, 0.125);
+                border-radius: 0.25rem;
+            }
+            
+            .container-fluid {
+                padding-right: 32%;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <h1 class="mb-3">Gem TD Helper</h1>
+        
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-info py-2">
+                    <strong>How to use:</strong> Click on the component cells to mark them as acquired. Click again to unmark.
+                </div>
+            </div>
+            <div class="col-md-12 text-end">
+                <button class="btn btn-danger btn-sm" id="resetAll">Reset All</button>
+            </div>
+        </div>
+        
+        <!-- Main content -->
+        <div>
+            <!-- Basic Gems -->
+                <h2 class="section-title">Basic Gems</h2>
+                
+                <!-- Silver -->
+                <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Chipped Diamond -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Chipped</span>
+                        <span class="gem-name">Diamond</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/chipped-diamond.png" alt="CD" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Chipped Sapphire -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Chipped</span>
+                        <span class="gem-name">Sapphire</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/chipped-sapphire.png" alt="CS" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Chipped Topaz -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Chipped</span>
+                        <span class="gem-name">Topaz</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/chipped-topaz.png" alt="CT" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+
+                <!-- Silver -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality"></span>
+                        <span class="gem-name">Silver</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/silver.png" alt="SILVER" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 20-21 | Cooldown: 1s | Splash damage with slows">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Malachite -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Chipped Emerald -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Chipped</span>
+                        <span class="gem-name">Emerald</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/chipped-emerald.png" alt="CE" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Chipped Aquamarine -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Chipped</span>
+                        <span class="gem-name">Aquamarine</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/chipped-aquamarine.png" alt="CA" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Chipped Opal -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Chipped</span>
+                        <span class="gem-name">Opal</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/chipped-opal.png" alt="CO" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Malachite -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality"></span>
+                        <span class="gem-name">Malachite</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/malachite.png" alt="MAL" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 6 | Cooldown: 0.5s | Can attack 3 targets at 750 range">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Star Ruby -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Chipped Ruby -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Chipped</span>
+                        <span class="gem-name">Ruby</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/chipped-ruby.png" alt="CR" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Ruby -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Ruby</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-ruby.png" alt="FR" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Chipped Amethyst -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Chipped</span>
+                        <span class="gem-name">Amethyst</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/chipped-amethyst.png" alt="CA" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Star Ruby -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Star</span>
+                        <span class="gem-name">Ruby</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/star-ruby.png" alt="SR" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 0 | Cooldown: 0s | 40 damage per second to enemies nearby">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Jade -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Normal Emerald -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Emerald</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-emerald.png" alt="NE" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Opal -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Opal</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-opal.png" alt="NO" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Sapphire -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Sapphire</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-sapphire.png" alt="FS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Jade -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality"></span>
+                        <span class="gem-name">Jade</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/jade.png" alt="JADE" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 30-35 | Cooldown: 0.5s | 50% slow poison over 2 seconds">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Premium Gems -->
+        <h2 class="section-title">Premium Gems</h2>
+        
+        <!-- Blood Stone -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Perfect Ruby -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Perfect</span>
+                        <span class="gem-name">Ruby</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/perfect-ruby.png" alt="PR" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawless Aquamarine -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawless</span>
+                        <span class="gem-name">Aquamarine</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawless-aquamarine.png" alt="FLA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Amethyst -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Amethyst</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-amethyst.png" alt="NA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Blood Stone -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality"></span>
+                        <span class="gem-name">Blood Stone</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/blood-stone.png" alt="BS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 115 | Cooldown: 1.5s | Splash damage and 60 DPS immolation">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Red Crystal -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Flawless Emerald -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawless</span>
+                        <span class="gem-name">Emerald</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawless-emerald.png" alt="FLE" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Ruby -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Ruby</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-ruby.png" alt="NR" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Amethyst -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Amethyst</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-amethyst.png" alt="FA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Red Crystal -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Red</span>
+                        <span class="gem-name">Crystal</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/red-crystal.png" alt="RC" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 50-75 | Cooldown: 0.8s | -4 armor aura to air units. Air only.">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-air">Air</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Yellow Sapphire -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Perfect Sapphire -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Perfect</span>
+                        <span class="gem-name">Sapphire</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/perfect-sapphire.png" alt="PS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawless Topaz -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawless</span>
+                        <span class="gem-name">Topaz</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawless-topaz.png" alt="FLT" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawless Ruby -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawless</span>
+                        <span class="gem-name">Ruby</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawless-ruby.png" alt="FLR" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Yellow Sapphire -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Yellow</span>
+                        <span class="gem-name">Sapphire</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/yellow-sapphire.png" alt="YS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 100 | Cooldown: 1s | 400 Splash damage with slows">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Uranium 238 -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Perfect Topaz -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Perfect</span>
+                        <span class="gem-name">Topaz</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/perfect-topaz.png" alt="PT" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Opal -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Opal</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-opal.png" alt="FO" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Sapphire -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Sapphire</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-sapphire.png" alt="NS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Uranium 238 -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Uranium</span>
+                        <span class="gem-name">238</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/uranium-238.png" alt="U238" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 0 | Cooldown: 0s | 200 DPS and 50% slows within 500 range">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dark Emerald -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Perfect Emerald -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Perfect</span>
+                        <span class="gem-name">Emerald</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/perfect-emerald.png" alt="PE" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawless Sapphire -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawless</span>
+                        <span class="gem-name">Sapphire</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawless-sapphire.png" alt="FLS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Topaz -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Topaz</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-topaz.png" alt="FT" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Dark Emerald -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Dark</span>
+                        <span class="gem-name">Emerald</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/dark-emerald.png" alt="DE" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 90-150 | Cooldown: 0.8s | 10% chance to stun for 1.5 seconds">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pink Diamond -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Perfect Diamond -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Perfect</span>
+                        <span class="gem-name">Diamond</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/perfect-diamond.png" alt="PD" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Topaz -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Topaz</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-topaz.png" alt="NT" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Diamond -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Diamond</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-diamond.png" alt="ND" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Pink Diamond -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Pink</span>
+                        <span class="gem-name">Diamond</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/pink-diamond.png" alt="PD" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 150-175 | Cooldown: 0.75s | 10% chance for 5x damage. Ground only.">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Paraiba Tourmaline -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Perfect Aquamarine -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Perfect</span>
+                        <span class="gem-name">Aquamarine</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/perfect-aquamarine.png" alt="PA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawless Opal -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawless</span>
+                        <span class="gem-name">Opal</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawless-opal.png" alt="FLO" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Emerald -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Emerald</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-emerald.png" alt="FE" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Aquamarine -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Aquamarine</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-aquamarine.png" alt="FA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Paraiba Tourmaline -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Paraiba</span>
+                        <span class="gem-name">Tourmaline</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/paraiba-tourmaline.png" alt="PT" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 10-400 | Cooldown: 0.75s | -4 armor to ground units, 20% frost nova">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Black Opal -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Perfect Opal -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Perfect</span>
+                        <span class="gem-name">Opal</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/perfect-opal.png" alt="PO" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawless Diamond -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawless</span>
+                        <span class="gem-name">Diamond</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawless-diamond.png" alt="FLD" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Aquamarine -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Aquamarine</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-aquamarine.png" alt="NA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Black Opal -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Black</span>
+                        <span class="gem-name">Opal</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/black-opal.png" alt="BO" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 25 | Cooldown: 1s | 30% damage aura with 1000 range">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gold -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Perfect Amethyst -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Perfect</span>
+                        <span class="gem-name">Amethyst</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/perfect-amethyst.png" alt="PA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawless Amethyst -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawless</span>
+                        <span class="gem-name">Amethyst</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawless-amethyst.png" alt="FLA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Diamond -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Diamond</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-diamond.png" alt="FD" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Gold -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality"></span>
+                        <span class="gem-name">Gold</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/gold.png" alt="GOLD" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 160-190 | Cooldown: 1s | 25% chance for 2x damage, -5 armor">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Special Slates -->
+        <h2 class="section-title">Special Slates</h2>
+        
+        <!-- Ancient Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Air Slate -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Air</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/air-slate.png" alt="AS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Hold Slate -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Hold</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/hold-slate.png" alt="HS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Ancient Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Ancient</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/ancient-slate.png" alt="ANC" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: (kills × 5-120) + (lvl × 50) | Cooldown: 2.5s | Holds units for 2.5s, -12 armor">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Wraith Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Slow Slate -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Slow</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/slow-slate.png" alt="SS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Opal Vein Slate -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Opal Vein</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/opal-vein-slate.png" alt="OVS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Wraith Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Wraith</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/wraith-slate.png" alt="WS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 200 | Cooldown: 0.3s | 10% speed aura, stacking 35 damage per hit">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Elder Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Spell Slate -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Spell</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/spell-slate.png" alt="SS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Poison Slate -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Poison</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/poison-slate.png" alt="PS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Elder Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Elder</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/elder-slate.png" alt="ES" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 100 | Cooldown: 0.33s | 45% chance to cast 250 dmg spells">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-mixed">Air & Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Viper Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Range Slate -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Range</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/range-slate.png" alt="RS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Damage Slate -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Damage</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/damage-slate.png" alt="DS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Viper Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Viper</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/viper-slate.png" alt="VS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 30 | Cooldown: 0.5s | 10% dmg aura, 50 DPS aura, 750 range">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Basic Slates -->
+        <h2 class="section-title">Basic Slates</h2>
+        
+        <!-- Air Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Flawed Emerald -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Emerald</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-emerald.png" alt="FE" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Opal -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Opal</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-opal.png" alt="FO" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Ruby -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Ruby</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-ruby.png" alt="FR" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Amethyst -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Amethyst</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-amethyst.png" alt="NA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Air Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Air</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/air-slate.png" alt="AS" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 40 | Cooldown: 0.5s | 850 range air attack">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-air">Air</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hold Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Flawed Amethyst -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Amethyst</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-amethyst.png" alt="FA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Sapphire -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Sapphire</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-sapphire.png" alt="FS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Topaz -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Topaz</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-topaz.png" alt="NT" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Hold Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Hold</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/hold-slate.png" alt="HS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 160 + (kills × 20) | Cooldown: 2s | Stuns for 1.5s on touch">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slow Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Flawed Diamond -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Diamond</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-diamond.png" alt="FD" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Emerald -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Emerald</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-emerald.png" alt="FE" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Aquamarine -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Aquamarine</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-aquamarine.png" alt="FA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Sapphire -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Sapphire</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-sapphire.png" alt="NS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Slow Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Slow</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/slow-slate.png" alt="SS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 100 | Cooldown: 0.5s | Permanent 15% base move speed slow">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Opal Vein Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Flawed Topaz -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Topaz</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-topaz.png" alt="FT" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Ruby -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Ruby</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-ruby.png" alt="FR" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Opal -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Opal</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-opal.png" alt="NO" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Opal Vein Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Opal Vein</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/opal-vein-slate.png" alt="OVS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 80 | Cooldown: 0.5s | 10% attack speed aura with 700 range">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Poison Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Flawed Topaz -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Topaz</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-topaz.png" alt="FT" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Opal -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Opal</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-opal.png" alt="FO" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Aquamarine -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Aquamarine</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-aquamarine.png" alt="FA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Emerald -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Emerald</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-emerald.png" alt="NE" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Poison Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Poison</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/poison-slate.png" alt="PS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 20 | Cooldown: 0.3s | 20 poison DPS for 20s, slows 25%">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Spell Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Flawed Diamond -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Diamond</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-diamond.png" alt="FD" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Amethyst -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Amethyst</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-amethyst.png" alt="FA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Aquamarine -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Aquamarine</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-aquamarine.png" alt="NA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Spell Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Spell</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/spell-slate.png" alt="SS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 30-40 | Cooldown: 0.5s | 30% chance for 75 dmg spells">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-mixed">Air & Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Range Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Flawed Topaz -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Topaz</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-topaz.png" alt="FT" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Amethyst -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Amethyst</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-amethyst.png" alt="FA" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Ruby -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Ruby</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-ruby.png" alt="FR" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Ruby -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Ruby</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-ruby.png" alt="NR" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Range Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Range</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/range-slate.png" alt="RS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: 15 | Cooldown: 0.5s | Attacks all targets within 600 range">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Damage Slate -->
+        <div class="gem-row">
+            <div class="d-flex flex-wrap">
+                <!-- Flawed Sapphire -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Sapphire</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-sapphire.png" alt="FS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Flawed Opal -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Flawed</span>
+                        <span class="gem-name">Opal</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/flawed-opal.png" alt="FO" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Normal Diamond -->
+                <div class="gem-cell" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Normal</span>
+                        <span class="gem-name">Diamond</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/normal-diamond.png" alt="ND" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Spacer -->
+                <div class="spacer"></div>
+                
+                <!-- Damage Slate -->
+                <div class="gem-cell result-gem" onclick="this.classList.toggle('acquired')">
+                    <div class="gem-text">
+                        <span class="gem-quality">Damage</span>
+                        <span class="gem-name">Slate</span>
+                    </div>
+                    <div class="gem-img" style="background-color: white;">
+                        <img src="img/damage-slate.png" alt="DS" style="width: 90%; height: 90%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Info -->
+                <div class="info-cell">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal" 
+                        data-info="Damage: (kills × 10) + (lvl × 20) | Cooldown: 1s | 10% damage aura">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </button>
+                    <span class="tower-type type-ground">Ground</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Modal -->
+        <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Tower Information</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="infoModalBody">
+                        <!-- Will be filled dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+<div class="alert alert-success mt-4 mb-3">
+    <h4>About Gem TD+</h4>
+    <p>This guide is designed specifically for Gem TD+, the popular tower defense game based on the classic Warcraft III custom map.</p>
+    
+    <h5 class="mt-3">How to Use This Helper:</h5>
+    <ul>
+        <li>Click on any gem to mark it as acquired (it will highlight in green)</li>
+        <li>Use the information buttons (ⓘ) to view detailed tower stats</li>
+        <li>Reference the maze design shown earlier for optimal tower placement</li>
+    </ul>
+    
+    <h5 class="mt-3">Strategy Tips:</h5>
+    <ul>
+        <li><strong>Premium Targets:</strong> Focus on building Dark Emerald, Yellow Sapphire, and Ancient Slate towers</li>
+        <li><strong>Ancient Slates:</strong> Place three of these close together near your center <strong>Marked <span style="color:red;">RED</span> on the Maze image</strong></li>
+        <li><strong>Early Game:</strong> Blood Stone is most effective when acquired early</li>
+        <li><strong>Economy:</strong> Jade is primarily useful for its gold-generating upgrade</li>
+    </ul>
+    
+    <p class="mt-3">Your tower configuration will ultimately depend on which gems you're able to obtain during your game. Good luck defending!</p>
+</div>
+
+        </div>
+        
+        <!-- Maze container (fixed position on right side for xl screens) -->
+        <div class="d-none d-xl-block" id="maze-container">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Maze Layout <small>(Select your position)</small></h5>
+                </div>
+                <div class="card-body text-center">
+                    <p class="small mb-2">Click a button below to view the corresponding maze layout:</p>
+                    <div class="btn-group mb-3" role="group" aria-label="Maze Selection">
+                        <button type="button" class="btn btn-outline-primary active" data-maze="1">1</button>
+                        <button type="button" class="btn btn-outline-primary" data-maze="2">2</button>
+                        <button type="button" class="btn btn-outline-primary" data-maze="3">3</button>
+                        <button type="button" class="btn btn-outline-primary" data-maze="4">4</button>
+                        <button type="button" class="btn btn-outline-primary" data-maze="5">5</button>
+                        <button type="button" class="btn btn-outline-primary" data-maze="6">6</button>
+                        <button type="button" class="btn btn-outline-primary" data-maze="7">7</button>
+                        <button type="button" class="btn btn-outline-primary" data-maze="8">8</button>
+                    </div>
+                    <img src="maze/1.jpg" alt="Gem TD Maze" id="maze-image" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    
+    <!-- Bootstrap & jQuery JS -->
+    <script src="inc/jquery-3.6.0.min.js"></script>
+    <script src="inc/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Set up localStorage to track acquired gems
+        $(document).ready(function() {
+            // Check if data exists in localStorage
+            if (localStorage.getItem('acquiredGems')) {
+                const acquired = JSON.parse(localStorage.getItem('acquiredGems'));
+                // Apply acquired class to saved gems
+                $('.gem-cell').each(function(index) {
+                    if (acquired[index]) {
+                        $(this).addClass('acquired');
+                    }
+                });
+            } else {
+                // Initialize localStorage with empty data
+                const acquired = Array($('.gem-cell').length).fill(false);
+                localStorage.setItem('acquiredGems', JSON.stringify(acquired));
+            }
+            
+            // Handle clicking on gems to toggle acquired state
+            $('.gem-cell').on('click', function() {
+                const acquired = JSON.parse(localStorage.getItem('acquiredGems'));
+                const index = $('.gem-cell').index(this);
+                acquired[index] = !acquired[index];
+                localStorage.setItem('acquiredGems', JSON.stringify(acquired));
+            });
+            
+            // Reset all button
+            $('#resetAll').on('click', function() {
+                if (confirm('Are you sure you want to reset all acquired gems?')) {
+                    $('.gem-cell').removeClass('acquired');
+                    const acquired = Array($('.gem-cell').length).fill(false);
+                    localStorage.setItem('acquiredGems', JSON.stringify(acquired));
+                }
+            });
+            
+            // Info modal
+            $('#infoModal').on('show.bs.modal', function (event) {
+                const button = $(event.relatedTarget);
+                const info = button.data('info');
+                $('#infoModalBody').text(info);
+            });
+            
+            // Maze selection buttons
+            $('.btn-group button[data-maze]').on('click', function() {
+                const mazeNumber = $(this).data('maze');
+                $('#maze-image').attr('src', `maze/${mazeNumber}.jpg`);
+                
+                // Update active button state
+                $('.btn-group button[data-maze]').removeClass('active');
+                $(this).addClass('active');
+            });
+        });
+    </script>
+</body>
+</html>
