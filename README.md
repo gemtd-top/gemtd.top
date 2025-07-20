@@ -2,7 +2,7 @@
 
 An interactive web-based tool to help players of Gem TD+ (a Warcraft III custom map) track gems, plan tower combinations, and optimize their defense strategy.
 
-## 🎮 [Try it out](https://yourusername.github.io/gemtd-helper/)
+## 🎮 [Try it out](https://gemtd.top/)
 
 ![Gem TD+ Helper Screenshot](inc/screenshot.jpg)
 
@@ -16,7 +16,7 @@ An interactive web-based tool to help players of Gem TD+ (a Warcraft III custom 
 
 ## How to Use
 
-1. Visit the [Gem TD+ Helper](https://yourusername.github.io/gemtd-helper/) web app
+1. Visit the [Gem TD+ Helper](hhttps://gemtd.top/) web app
 2. Click on gems to mark them as acquired (they'll highlight in green)
 3. Use the information buttons (ⓘ) to view detailed tower stats
 4. Reference the maze design for optimal tower placement
@@ -39,9 +39,9 @@ An interactive web-based tool to help players of Gem TD+ (a Warcraft III custom 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/gemtd-helper.git
+git clone https://github.com/gemtd-top/gemtd-top.git
 
 # Navigate to the project directory
-cd gemtd-helper
+cd gemtd-top
 
 # Open index.html in your browser
