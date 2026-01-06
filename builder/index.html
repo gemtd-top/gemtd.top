@@ -14,6 +14,30 @@
             margin: 0;
             font-family: Arial, sans-serif;
         }
+
+        /* When embedded in iframe, remove min-height to prevent scrollbars */
+        body.embedded {
+            min-height: auto;
+            padding: 10px 0;
+        }
+
+        body.embedded .instructions {
+            display: none;
+        }
+
+        body.embedded .preset-bar {
+            margin-bottom: 8px;
+            padding: 6px 12px;
+        }
+
+        body.embedded .info-bar {
+            margin-top: 8px;
+            padding: 6px 10px;
+        }
+
+        body.embedded .buttons {
+            margin-top: 6px;
+        }
         canvas { border: 1px solid #333; }
         .buttons {
             display: flex;
@@ -223,6 +247,11 @@
     </div>
     
     <script>
+        // Detect if embedded in iframe
+        if (window.self !== window.top) {
+            document.body.classList.add('embedded');
+        }
+
         const canvas = document.getElementById('map');
         const ctx = canvas.getContext('2d');
         const CELL = 10;
