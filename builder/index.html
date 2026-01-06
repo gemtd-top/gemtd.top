@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gem TD Map</title>
+    <style>
+        body {
+            background: #555;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        canvas { border: 1px solid #333; }
+        .buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .position-label {
+            color: #fff;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+        .btn {
+            width: 40px;
+            height: 50px;
+            background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
+            border: 2px solid #666;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:hover {
+            background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%);
+            border-color: #888;
+            transform: translateY(-2px);
+        }
+        .btn:active {
+            transform: translateY(0);
+            background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+        }
+        .btn.active {
+            background: linear-gradient(180deg, #5a8a5a 0%, #3a6a3a 100%);
+            border-color: #8f8;
+        }
+        .info-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+        .rock-count {
+            color: #fff;
+            font-size: 14px;
+        }
+        .rock-count strong {
+            color: #8f8;
+            font-size: 16px;
+        }
+        .action-btn {
+            padding: 6px 12px;
+            background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
+            border: 2px solid #666;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover {
+            background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%);
+            border-color: #888;
+        }
+        .preset-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+        .preset-bar label {
+            color: #fff;
+            font-size: 14px;
+        }
+        .preset-bar select {
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: 2px solid #666;
+            background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
+            color: #fff;
+            cursor: pointer;
+            min-width: 200px;
+        }
+        .preset-bar select:hover {
+            border-color: #888;
+        }
+        .preset-bar select option {
+            background: #2a2a2a;
+            color: #fff;
+        }
+        .main-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .slate-box {
+            width: 30px;
+            height: 30px;
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #666;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+        }
+        .slate-box:hover {
+            border-color: #8f8;
+        }
+        .slate-box img {
+            width: 24px;
+            height: 24px;
+            pointer-events: none;
+        }
+        .slate-box:active {
+            cursor: grabbing;
+        }
+        .divider {
+            width: 1px;
+            height: 24px;
+            background: #666;
+            margin: 0 5px;
+        }
+        .instructions {
+            margin-top: 15px;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            max-width: 650px;
+            text-align: left;
+        }
+        .instructions p {
+            color: #ccc;
+            font-size: 13px;
+            margin: 5px 0;
+        }
+        .instructions strong {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="preset-bar">
+        <label for="presetSelect">Load Preset Maze:</label>
+        <select id="presetSelect">
+            <option value="">-- Select a maze --</option>
+            <option value="/json/gemtd.top-safe-build.json" selected>Safe Build</option>
+            <option value="/json/gemtd.top-fast-and-risky.json">Fast and Risky</option>
+            <option value="/json/gemtd.top-clear.json">None (Clear Maze)</option>
+        </select>
+        <button class="action-btn" id="clearMaze">🗑️ Clear Maze</button>
+    </div>
+    <div class="main-container">
+        <canvas id="map" width="650" height="650"></canvas>
+    </div>
+    <div class="info-bar">
+        <div class="slate-box" data-slate="ancient">
+            <img src="/img/ancient-slate-alt.png" draggable="true">
+        </div>
+        <div class="slate-box" data-slate="wraith">
+            <img src="/img/wraith-slate-alt.png" draggable="true">
+        </div>
+        <div class="slate-box" data-slate="elder">
+            <img src="/img/elder-slate-alt.png" draggable="true">
+        </div>
+        <div class="slate-box" data-slate="viper">
+            <img src="/img/viper-slate-alt.png" draggable="true">
+        </div>
+        <span class="divider"></span>
+        <span class="rock-count">Rocks: <strong id="rockCount">0</strong></span>
+        <span class="rock-count">Slates: <strong id="slateCount">0</strong></span>
+        <span class="divider"></span>
+        <button class="action-btn" id="exportPic">📷 Picture</button>
+        <button class="action-btn" id="exportJson">💾 Export</button>
+        <button class="action-btn" id="importJson">📂 Import</button>
+        <input type="file" id="fileInput" accept=".json" style="display: none;">
+    </div>
+    <div class="buttons">
+        <span class="position-label">Position:</span>
+        <button class="btn" data-btn="1">1</button>
+        <button class="btn" data-btn="2">2</button>
+        <button class="btn" data-btn="3">3</button>
+        <button class="btn" data-btn="4">4</button>
+        <button class="btn" data-btn="5">5</button>
+        <button class="btn" data-btn="6">6</button>
+        <button class="btn" data-btn="7">7</button>
+        <button class="btn" data-btn="8">8</button>
+    </div>
+    <div class="instructions">
+        <p><strong>How to use:</strong></p>
+        <p>🪨 <strong>Click</strong> on white/green areas to place mazing rocks (click again to remove)</p>
+        <p>🎯 <strong>Drag</strong> slate icons onto the map to mark positions (drag placed slates to move them)</p>
+        <p>🔄 <strong>Buttons 1-8</strong> rotate/flip the maze view for different spawn positions</p>
+        <p>💾 <strong>Export/Import</strong> JSON to save and load your maze designs</p>
+        <p>📷 <strong>Export</strong> image to download your maze as a PNG</p>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('map');
+        const ctx = canvas.getContext('2d');
+        const CELL = 10;
+        const SIZE = 65;
+        
+        const COLORS = {
+            buildable: '#FFFFFF',
+            path: '#90EE90',
+            checkpoint: '#006400',
+            entry: '#F08080',
+            exit: '#F08080',
+            border: '#555555'
+        };
+        
+        let originalGrid = Array(SIZE).fill(null).map(() => Array(SIZE).fill('buildable'));
+        let grid = [];
+        
+        // Rock positions (stored as top-left corner of 2x2 rock in original orientation)
+        let originalRocks = [];
+        let rocks = [];
+        
+        // Slate positions (stored as pixel coordinates, unconstrained)
+        let originalSlates = [];
+        let slates = [];
+        
+        // Slate images
+        const slateImages = {
+            ancient: new Image(),
+            wraith: new Image(),
+            elder: new Image(),
+            viper: new Image()
+        };
+        slateImages.ancient.src = '/img/ancient-slate-alt.png';
+        slateImages.wraith.src = '/img/wraith-slate-alt.png';
+        slateImages.elder.src = '/img/elder-slate-alt.png';
+        slateImages.viper.src = '/img/viper-slate-alt.png';
+        
+        const SLATE_SIZE = 24; // 2.4 cells = 24 pixels
+        
+        // Load rock SVG as image
+        const rockSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 666.67 666.67"><path d="M51.33 51.22h566v566h-566z" fill="#565622"/><g fill="#061a00"><path d="M566.67 666.67H100c-55.14 0-100-44.86-100-100V100C0 44.86 44.86 0 100 0h466.67c55.14 0 100 44.86 100 100v466.67c0 55.14-44.86 100-100 100zM100 66.67c-18.38 0-33.33 14.95-33.33 33.33v466.67C66.67 585.05 81.62 600 100 600h466.67c18.38 0 33.33-14.95 33.33-33.33V100c0-18.38-14.95-33.33-33.33-33.33H100zm133.33 400c-8.53 0-17.06-3.25-23.57-9.76-13.02-13.02-13.02-34.12 0-47.14l200-200c13.02-13.02 34.12-13.02 47.14 0s13.02 34.12 0 47.14l-200 200c-6.51 6.51-15.04 9.76-23.57 9.76z"/><path d="M433.33 466.67c-8.53 0-17.06-3.25-23.57-9.76l-200-200c-13.02-13.02-13.02-34.12 0-47.14s34.12-13.02 47.14 0l200 200c13.02 13.02 13.02 34.12 0 47.14-6.51 6.51-15.04 9.76-23.57 9.76z"/></g></svg>`;
+        const rockImg = new Image();
+        rockImg.src = 'data:image/svg+xml;base64,' + btoa(rockSvg);
+        
+        // Current transformation
+        let currentTransform = 1;
+        
+        // Checkpoint center positions (where numbers are drawn)
+        const originalCheckpoints = [
+            { x: 1, y: 7 },   // 0
+            { x: 13, y: 7 },  // 1
+            { x: 13, y: 31 }, // 2
+            { x: 45, y: 31 }, // 3
+            { x: 45, y: 7 },  // 4
+            { x: 29, y: 7 },  // 5
+            { x: 29, y: 47 }  // 6
+        ];
+        let checkpoints = [];
+        
+        // Fill a rectangle with a type
+        function fill(x, y, w, h, type) {
+            for (let dy = 0; dy < h; dy++) {
+                for (let dx = 0; dx < w; dx++) {
+                    if (y + dy < SIZE && x + dx < SIZE) {
+                        originalGrid[y + dy][x + dx] = type;
+                    }
+                }
+            }
+        }
+        
+        // T checkpoint pointing in a direction
+        function tCheckpoint(x, y, direction) {
+            if (direction === 'right') {
+                fill(x, y, 2, 6, 'checkpoint');
+                fill(x + 2, y + 2, 2, 2, 'checkpoint');
+            } else if (direction === 'left') {
+                fill(x + 2, y, 2, 6, 'checkpoint');
+                fill(x, y + 2, 2, 2, 'checkpoint');
+            } else if (direction === 'down') {
+                fill(x, y, 6, 2, 'checkpoint');
+                fill(x + 2, y + 2, 2, 2, 'checkpoint');
+            } else if (direction === 'up') {
+                fill(x, y + 2, 6, 2, 'checkpoint');
+                fill(x + 2, y, 2, 2, 'checkpoint');
+            }
+        }
+        
+        // === TRANSFORMATION FUNCTIONS ===
+        function flipHorizontal(g) {
+            const newGrid = Array(SIZE).fill(null).map(() => Array(SIZE).fill('buildable'));
+            for (let y = 0; y < SIZE; y++) {
+                for (let x = 0; x < SIZE; x++) {
+                    newGrid[y][SIZE - 1 - x] = g[y][x];
+                }
+            }
+            return newGrid;
+        }
+        
+        function flipVertical(g) {
+            const newGrid = Array(SIZE).fill(null).map(() => Array(SIZE).fill('buildable'));
+            for (let y = 0; y < SIZE; y++) {
+                for (let x = 0; x < SIZE; x++) {
+                    newGrid[SIZE - 1 - y][x] = g[y][x];
+                }
+            }
+            return newGrid;
+        }
+        
+        function rotate90CW(g) {
+            const newGrid = Array(SIZE).fill(null).map(() => Array(SIZE).fill('buildable'));
+            for (let y = 0; y < SIZE; y++) {
+                for (let x = 0; x < SIZE; x++) {
+                    newGrid[x][SIZE - 1 - y] = g[y][x];
+                }
+            }
+            return newGrid;
+        }
+        
+        function rotate180(g) {
+            const newGrid = Array(SIZE).fill(null).map(() => Array(SIZE).fill('buildable'));
+            for (let y = 0; y < SIZE; y++) {
+                for (let x = 0; x < SIZE; x++) {
+                    newGrid[SIZE - 1 - y][SIZE - 1 - x] = g[y][x];
+                }
+            }
+            return newGrid;
+        }
+        
+        function rotate270CW(g) {
+            const newGrid = Array(SIZE).fill(null).map(() => Array(SIZE).fill('buildable'));
+            for (let y = 0; y < SIZE; y++) {
+                for (let x = 0; x < SIZE; x++) {
+                    newGrid[SIZE - 1 - x][y] = g[y][x];
+                }
+            }
+            return newGrid;
+        }
+        
+        // Transform checkpoint positions (these are center points, not cell indices)
+        function transformCheckpoint(cp, transform) {
+            let x = cp.x, y = cp.y;
+            switch (transform) {
+                case 1: // Original
+                    return { x, y };
+                case 2: // Flip horizontal
+                    return { x: SIZE - x, y };
+                case 3: // Rotate 90 CW
+                    return { x: SIZE - y, y: x };
+                case 4: // Rotate 90 CW + flip vertical
+                    return { x: SIZE - y, y: SIZE - x };
+                case 5: // Rotate 180
+                    return { x: SIZE - x, y: SIZE - y };
+                case 6: // Rotate 180 + flip horizontal
+                    return { x, y: SIZE - y };
+                case 7: // Rotate 270 CW
+                    return { x: y, y: SIZE - x };
+                case 8: // Rotate 270 CW + flip vertical
+                    return { x: y, y: x };
+            }
+        }
+        
+        // Transform rock position (top-left corner of 2x2)
+        function transformRock(rock, transform) {
+            let x = rock.x, y = rock.y;
+            // For rocks, we need to transform and then adjust for the 2x2 size
+            switch (transform) {
+                case 1: // Original
+                    return { x, y };
+                case 2: // Flip horizontal
+                    return { x: SIZE - 2 - x, y };
+                case 3: // Rotate 90 CW
+                    return { x: SIZE - 2 - y, y: x };
+                case 4: // Rotate 90 CW + flip vertical
+                    return { x: SIZE - 2 - y, y: SIZE - 2 - x };
+                case 5: // Rotate 180
+                    return { x: SIZE - 2 - x, y: SIZE - 2 - y };
+                case 6: // Rotate 180 + flip horizontal
+                    return { x, y: SIZE - 2 - y };
+                case 7: // Rotate 270 CW
+                    return { x: y, y: SIZE - 2 - x };
+                case 8: // Rotate 270 CW + flip vertical
+                    return { x: y, y: x };
+            }
+        }
+        
+        // Transform slate position (pixel coordinates)
+        function transformSlate(slate, transform) {
+            let x = slate.x, y = slate.y;
+            const canvasSize = SIZE * CELL;
+            const offset = SLATE_SIZE; // Account for slate size in transforms
+            switch (transform) {
+                case 1: // Original
+                    return { x, y, type: slate.type };
+                case 2: // Flip horizontal
+                    return { x: canvasSize - offset - x, y, type: slate.type };
+                case 3: // Rotate 90 CW
+                    return { x: canvasSize - offset - y, y: x, type: slate.type };
+                case 4: // Rotate 90 CW + flip vertical
+                    return { x: canvasSize - offset - y, y: canvasSize - offset - x, type: slate.type };
+                case 5: // Rotate 180
+                    return { x: canvasSize - offset - x, y: canvasSize - offset - y, type: slate.type };
+                case 6: // Rotate 180 + flip horizontal
+                    return { x, y: canvasSize - offset - y, type: slate.type };
+                case 7: // Rotate 270 CW
+                    return { x: y, y: canvasSize - offset - x, type: slate.type };
+                case 8: // Rotate 270 CW + flip vertical
+                    return { x: y, y: x, type: slate.type };
+            }
+        }
+        
+        // Reverse transform slate position
+        function reverseTransformSlate(slate, transform) {
+            let x = slate.x, y = slate.y;
+            const canvasSize = SIZE * CELL;
+            const offset = SLATE_SIZE;
+            switch (transform) {
+                case 1:
+                    return { x, y, type: slate.type };
+                case 2:
+                    return { x: canvasSize - offset - x, y, type: slate.type };
+                case 3:
+                    return { x: y, y: canvasSize - offset - x, type: slate.type };
+                case 4:
+                    return { x: canvasSize - offset - y, y: canvasSize - offset - x, type: slate.type };
+                case 5:
+                    return { x: canvasSize - offset - x, y: canvasSize - offset - y, type: slate.type };
+                case 6:
+                    return { x, y: canvasSize - offset - y, type: slate.type };
+                case 7:
+                    return { x: canvasSize - offset - y, y: x, type: slate.type };
+                case 8:
+                    return { x: y, y: x, type: slate.type };
+            }
+        }
+        
+        function applyTransform(btnNum) {
+            currentTransform = btnNum;
+            let g = originalGrid.map(row => [...row]);
+            
+            switch (btnNum) {
+                case 1: // Original
+                    grid = g;
+                    break;
+                case 2: // Flip horizontal
+                    grid = flipHorizontal(g);
+                    break;
+                case 3: // Rotate 90 CW
+                    grid = rotate90CW(g);
+                    break;
+                case 4: // Rotate 90 CW + flip vertical
+                    grid = flipVertical(rotate90CW(g));
+                    break;
+                case 5: // Rotate 180
+                    grid = rotate180(g);
+                    break;
+                case 6: // Rotate 180 + flip horizontal
+                    grid = flipHorizontal(rotate180(g));
+                    break;
+                case 7: // Rotate 270 CW
+                    grid = rotate270CW(g);
+                    break;
+                case 8: // Rotate 270 CW + flip vertical
+                    grid = flipVertical(rotate270CW(g));
+                    break;
+            }
+            
+            // Transform checkpoint positions
+            checkpoints = originalCheckpoints.map(cp => transformCheckpoint(cp, btnNum));
+            
+            // Transform rock positions
+            rocks = originalRocks.map(rock => transformRock(rock, btnNum));
+            
+            // Transform slate positions
+            slates = originalSlates.map(slate => transformSlate(slate, btnNum));
+            
+            render();
+        }
+        
+        // Check if a 2x2 rock can be placed at position (in current transformed view)
+        function canPlaceRock(x, y) {
+            // Check all 4 cells of the 2x2 rock
+            for (let dy = 0; dy < 2; dy++) {
+                for (let dx = 0; dx < 2; dx++) {
+                    const cx = x + dx;
+                    const cy = y + dy;
+                    
+                    // Out of bounds
+                    if (cx < 0 || cx >= SIZE || cy < 0 || cy >= SIZE) return false;
+                    
+                    const cellType = grid[cy][cx];
+                    
+                    // Can only place on buildable (white) or path (light green)
+                    if (cellType !== 'buildable' && cellType !== 'path') return false;
+                    
+                    // Check if overlapping with existing rock
+                    if (getRockAtPosition(cx, cy) >= 0) return false;
+                }
+            }
+            return true;
+        }
+        
+        // Convert transformed rock position back to original
+        function reverseTransformRock(rock, transform) {
+            let x = rock.x, y = rock.y;
+            switch (transform) {
+                case 1: // Original
+                    return { x, y };
+                case 2: // Flip horizontal -> flip horizontal to reverse
+                    return { x: SIZE - 2 - x, y };
+                case 3: // Rotate 90 CW -> Rotate 270 CW to reverse
+                    return { x: y, y: SIZE - 2 - x };
+                case 4: // Rotate 90 CW + flip vertical -> flip vertical + rotate 270 CW
+                    return { x: SIZE - 2 - y, y: SIZE - 2 - x };
+                case 5: // Rotate 180 -> Rotate 180 to reverse
+                    return { x: SIZE - 2 - x, y: SIZE - 2 - y };
+                case 6: // Rotate 180 + flip horizontal -> flip horizontal + rotate 180
+                    return { x, y: SIZE - 2 - y };
+                case 7: // Rotate 270 CW -> Rotate 90 CW to reverse
+                    return { x: SIZE - 2 - y, y: x };
+                case 8: // Rotate 270 CW + flip vertical -> flip vertical + rotate 90 CW
+                    return { x: y, y: x };
+            }
+        }
+        
+        // Check if rock exists at position (in transformed coordinates)
+        function getRockAtPosition(x, y) {
+            return rocks.findIndex(rock => 
+                x >= rock.x && x < rock.x + 2 && 
+                y >= rock.y && y < rock.y + 2
+            );
+        }
+        
+        // Hover position for rock preview
+        let hoverX = -1;
+        let hoverY = -1;
+        
+        // Slate drag state
+        let draggingSlate = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+        
+        // === BUILD MAP ===
+        
+        // Top border: dark gray, 1 high, full width at y=0
+        fill(0, 0, 65, 1, 'border');
+        
+        // Right border: dark gray, 2 wide, 39 high from top right corner
+        fill(63, 0, 2, 39, 'border');
+        
+        // Second right border section: 6 wide, 33 high from top right
+        fill(59, 0, 6, 33, 'border');
+        
+        // Third right border section: 10 wide, 27 high from top right
+        fill(55, 0, 10, 27, 'border');
+        
+        // Fourth right border section: 14 wide, 21 high from top right
+        fill(51, 0, 14, 21, 'border');
+        
+        // First T checkpoint: 3 from border, 0 from left, pointing right
+        tCheckpoint(0, 4, 'right');
+        
+        // Entry: 2 high, 6 wide, right after the T stem
+        fill(4, 6, 6, 2, 'entry');
+        
+        // Second T checkpoint (1): at end of entry, pointing down
+        tCheckpoint(10, 6, 'down');
+        
+        // Path going down 18 from the stem
+        fill(12, 10, 2, 18, 'path');
+        
+        // Checkpoint 2: at bottom of path, pointing right
+        tCheckpoint(12, 28, 'right');
+        
+        // Path going right 26 from the stem
+        fill(16, 30, 26, 2, 'path');
+        
+        // Checkpoint 3: at end of horizontal path, pointing up
+        tCheckpoint(42, 28, 'up');
+        
+        // Path going up 18 from the stem
+        fill(44, 10, 2, 18, 'path');
+        
+        // Checkpoint 4: at top of vertical path, pointing left
+        tCheckpoint(42, 4, 'left');
+        
+        // Path going left 10 from the stem
+        fill(32, 6, 10, 2, 'path');
+        
+        // Checkpoint 5: at end of horizontal path, pointing down
+        tCheckpoint(26, 6, 'down');
+        
+        // Path going down 34 from the stem
+        fill(28, 10, 2, 34, 'path');
+        
+        // Checkpoint 6: at end of vertical path, pointing right
+        tCheckpoint(28, 44, 'right');
+        
+        // Path going right 32 from the stem
+        fill(32, 46, 32, 2, 'path');
+        
+        // Exit: red path 1 wide at end of horizontal path
+        fill(64, 46, 1, 2, 'exit');
+        
+        // === RENDER ===
+        function render() {
+            ctx.fillStyle = '#555';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for (let y = 0; y < SIZE; y++) {
+                for (let x = 0; x < SIZE; x++) {
+                    ctx.fillStyle = COLORS[grid[y][x]];
+                    ctx.fillRect(x * CELL, y * CELL, CELL, CELL);
+                }
+            }
+            
+            // Draw rocks
+            rocks.forEach(rock => {
+                ctx.drawImage(rockImg, rock.x * CELL, rock.y * CELL, 2 * CELL, 2 * CELL);
+            });
+            
+            // Draw hover preview if valid position
+            if (hoverX >= 0 && hoverY >= 0 && canPlaceRock(hoverX, hoverY)) {
+                ctx.fillStyle = 'rgba(150, 150, 150, 0.5)';
+                ctx.fillRect(hoverX * CELL, hoverY * CELL, 2 * CELL, 2 * CELL);
+            }
+            
+            // Draw slates
+            slates.forEach(slate => {
+                const img = slateImages[slate.type];
+                if (img.complete) {
+                    ctx.drawImage(img, slate.x, slate.y, SLATE_SIZE, SLATE_SIZE);
+                }
+            });
+            
+            // Grid lines
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i <= SIZE; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * CELL, 0);
+                ctx.lineTo(i * CELL, SIZE * CELL);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, i * CELL);
+                ctx.lineTo(SIZE * CELL, i * CELL);
+                ctx.stroke();
+            }
+            
+            // Draw checkpoint numbers (always upright)
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            checkpoints.forEach((cp, i) => {
+                ctx.fillText(i.toString(), cp.x * CELL, cp.y * CELL);
+            });
+            
+            // Update rock count
+            document.getElementById('rockCount').textContent = originalRocks.length;
+            document.getElementById('slateCount').textContent = originalSlates.length;
+        }
+        
+        // Canvas click handler for rock placement
+        canvas.addEventListener('click', (e) => {
+            // Don't place rocks if we were dragging a slate
+            if (draggingSlate) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const clickX = Math.floor((e.clientX - rect.left) / CELL);
+            const clickY = Math.floor((e.clientY - rect.top) / CELL);
+            
+            // Check if clicking on an existing slate first
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            for (let i = slates.length - 1; i >= 0; i--) {
+                const slate = slates[i];
+                if (mouseX >= slate.x && mouseX < slate.x + SLATE_SIZE &&
+                    mouseY >= slate.y && mouseY < slate.y + SLATE_SIZE) {
+                    return; // Don't place rock if clicking on slate
+                }
+            }
+            
+            // Rock position is where you click (top-left of 2x2 rock)
+            const rockX = clickX;
+            const rockY = clickY;
+            
+            // Check if there's already a rock here
+            const existingRockIndex = getRockAtPosition(clickX, clickY);
+            
+            if (existingRockIndex >= 0) {
+                // Remove the rock (from original rocks array)
+                const originalRockIndex = originalRocks.findIndex(or => {
+                    const transformed = transformRock(or, currentTransform);
+                    return transformed.x === rocks[existingRockIndex].x && 
+                           transformed.y === rocks[existingRockIndex].y;
+                });
+                if (originalRockIndex >= 0) {
+                    originalRocks.splice(originalRockIndex, 1);
+                }
+                rocks.splice(existingRockIndex, 1);
+                render();
+            } else if (canPlaceRock(rockX, rockY)) {
+                // Place new rock - store in original coordinates
+                const originalPos = reverseTransformRock({ x: rockX, y: rockY }, currentTransform);
+                originalRocks.push(originalPos);
+                rocks.push({ x: rockX, y: rockY });
+                render();
+            }
+        });
+        
+        // Mouse move handler for hover preview
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            hoverX = Math.floor((e.clientX - rect.left) / CELL);
+            hoverY = Math.floor((e.clientY - rect.top) / CELL);
+            render();
+        });
+        
+        // Mouse leave handler to clear hover
+        canvas.addEventListener('mouseleave', () => {
+            hoverX = -1;
+            hoverY = -1;
+            render();
+        });
+        
+        // Slate drag and drop
+        document.querySelectorAll('.slate-box').forEach(box => {
+            box.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                draggingSlate = {
+                    type: box.dataset.slate,
+                    isNew: true
+                };
+                
+                // Create a floating drag image
+                const dragImg = document.createElement('img');
+                dragImg.src = box.querySelector('img').src;
+                dragImg.id = 'drag-slate';
+                dragImg.style.cssText = `
+                    position: fixed;
+                    width: ${SLATE_SIZE}px;
+                    height: ${SLATE_SIZE}px;
+                    pointer-events: none;
+                    z-index: 1000;
+                    opacity: 0.8;
+                `;
+                document.body.appendChild(dragImg);
+                
+                moveSlateImg(e);
+            });
+        });
+        
+        // Handle clicking on existing slates to drag them
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Check if clicking on an existing slate
+            for (let i = slates.length - 1; i >= 0; i--) {
+                const slate = slates[i];
+                if (mouseX >= slate.x && mouseX < slate.x + SLATE_SIZE &&
+                    mouseY >= slate.y && mouseY < slate.y + SLATE_SIZE) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    draggingSlate = {
+                        type: slate.type,
+                        isNew: false,
+                        originalIndex: i
+                    };
+                    dragOffsetX = mouseX - slate.x;
+                    dragOffsetY = mouseY - slate.y;
+                    
+                    // Remove from arrays temporarily
+                    const origIdx = originalSlates.findIndex(os => {
+                        const transformed = transformSlate(os, currentTransform);
+                        return Math.abs(transformed.x - slate.x) < 1 && Math.abs(transformed.y - slate.y) < 1;
+                    });
+                    if (origIdx >= 0) {
+                        originalSlates.splice(origIdx, 1);
+                    }
+                    slates.splice(i, 1);
+                    
+                    // Create drag image
+                    const dragImg = document.createElement('img');
+                    dragImg.src = slateImages[slate.type].src;
+                    dragImg.id = 'drag-slate';
+                    dragImg.style.cssText = `
+                        position: fixed;
+                        width: ${SLATE_SIZE}px;
+                        height: ${SLATE_SIZE}px;
+                        pointer-events: none;
+                        z-index: 1000;
+                        opacity: 0.8;
+                    `;
+                    document.body.appendChild(dragImg);
+                    
+                    moveSlateImg(e);
+                    render();
+                    return;
+                }
+            }
+        });
+        
+        function moveSlateImg(e) {
+            const dragImg = document.getElementById('drag-slate');
+            if (dragImg) {
+                dragImg.style.left = (e.clientX - SLATE_SIZE/2) + 'px';
+                dragImg.style.top = (e.clientY - SLATE_SIZE/2) + 'px';
+            }
+        }
+        
+        document.addEventListener('mousemove', (e) => {
+            if (draggingSlate) {
+                moveSlateImg(e);
+            }
+        });
+        
+        document.addEventListener('mouseup', (e) => {
+            if (!draggingSlate) return;
+            
+            const dragImg = document.getElementById('drag-slate');
+            if (dragImg) {
+                dragImg.remove();
+            }
+            
+            const rect = canvas.getBoundingClientRect();
+            const dropX = e.clientX - rect.left - SLATE_SIZE/2;
+            const dropY = e.clientY - rect.top - SLATE_SIZE/2;
+            
+            // Check if dropped on canvas
+            if (dropX >= 0 && dropX <= SIZE * CELL - SLATE_SIZE &&
+                dropY >= 0 && dropY <= SIZE * CELL - SLATE_SIZE) {
+                
+                const newSlate = { x: dropX, y: dropY, type: draggingSlate.type };
+                slates.push(newSlate);
+                
+                // Store in original coordinates
+                const originalPos = reverseTransformSlate(newSlate, currentTransform);
+                originalSlates.push(originalPos);
+                
+                render();
+            }
+            
+            draggingSlate = null;
+        });
+        
+        // Initialize with transform 1 (original)
+        rockImg.onload = () => {
+            applyTransform(1);
+        };
+        applyTransform(1);
+        
+        // Button click handlers
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const btnNum = parseInt(btn.dataset.btn);
+                applyTransform(btnNum);
+                
+                // Update active button style
+                document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        // Set button 1 as active initially
+        document.querySelector('[data-btn="1"]').classList.add('active');
+        
+        // Load Safe Build preset on page load
+        window.addEventListener('load', () => {
+            const presetSelect = document.getElementById('presetSelect');
+            if (presetSelect.value) {
+                fetch(presetSelect.value)
+                    .then(response => {
+                        if (!response.ok) throw new Error('File not found');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.rocks && Array.isArray(data.rocks)) {
+                            originalRocks = data.rocks;
+                            originalSlates = data.slates || [];
+                            if (data.transform) {
+                                currentTransform = data.transform;
+                                document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+                                document.querySelector(`[data-btn="${currentTransform}"]`).classList.add('active');
+                            }
+                            applyTransform(currentTransform);
+                        }
+                    })
+                    .catch(err => {
+                        console.log('Could not load preset:', err.message);
+                    });
+            }
+        });
+        
+        // Export image functionality
+        document.getElementById('exportPic').addEventListener('click', () => {
+            // Temporarily hide hover preview
+            const tempHoverX = hoverX;
+            const tempHoverY = hoverY;
+            hoverX = -1;
+            hoverY = -1;
+            render();
+            
+            // Create a new canvas for export with watermarks
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = canvas.width;
+            exportCanvas.height = canvas.height;
+            const expCtx = exportCanvas.getContext('2d');
+            
+            // Copy original canvas
+            expCtx.drawImage(canvas, 0, 0);
+            
+            // Watermark text setup
+            const fontSize = 15;
+            expCtx.font = `bold ${fontSize}px Arial`;
+            
+            // Helper to check if a rectangle overlaps any rock or slate
+            function overlapsContent(x, y, w, h) {
+                // Check rocks (in grid coordinates)
+                for (const rock of rocks) {
+                    const rx = rock.x * CELL;
+                    const ry = rock.y * CELL;
+                    const rw = 2 * CELL;
+                    const rh = 2 * CELL;
+                    if (x < rx + rw && x + w > rx && y < ry + rh && y + h > ry) {
+                        return true;
+                    }
+                }
+                // Check slates (in pixel coordinates)
+                for (const slate of slates) {
+                    if (x < slate.x + SLATE_SIZE && x + w > slate.x && 
+                        y < slate.y + SLATE_SIZE && y + h > slate.y) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            // Helper to check if position is in buildable (white) or checkpoint area
+            function isValidForWatermark(x, y) {
+                const gx = Math.floor(x / CELL);
+                const gy = Math.floor(y / CELL);
+                if (gx < 0 || gx >= SIZE || gy < 0 || gy >= SIZE) return false;
+                const cellType = grid[gy][gx];
+                return cellType === 'buildable' || cellType === 'checkpoint' || cellType === 'path';
+            }
+            
+            // Helper to check if entire text area is in valid space
+            function textAreaInBuildable(x, y, w, h) {
+                // Check all corners and some edge points
+                for (let px = x; px <= x + w; px += w/4) {
+                    for (let py = y; py <= y + h; py += h/2) {
+                        if (!isValidForWatermark(px, py)) return false;
+                    }
+                }
+                return true;
+            }
+            
+            function drawWatermarkText(x, y, rotation) {
+                expCtx.save();
+                expCtx.translate(x, y);
+                if (rotation) expCtx.rotate(rotation);
+                
+                const text1 = 'Built with ';
+                const text2 = 'GemTD.top';
+                const width1 = expCtx.measureText(text1).width;
+                const width2 = expCtx.measureText(text2).width;
+                
+                expCtx.textAlign = 'left';
+                expCtx.textBaseline = 'middle';
+                
+                // Draw "Built with " in gray
+                expCtx.fillStyle = '#888';
+                expCtx.fillText(text1, 0, 0);
+                
+                // Draw "GemTD.top" in red
+                expCtx.fillStyle = '#ff4444';
+                expCtx.fillText(text2, width1, 0);
+                
+                expCtx.restore();
+            }
+            
+            const textWidth = expCtx.measureText('Built with GemTD.top').width;
+            const textHeight = fontSize;
+            const margin = 2;
+            
+            // Find rock/slate bounds
+            let minRockY = canvas.height, maxRockY = 0;
+            let minRockX = canvas.width, maxRockX = 0;
+            
+            for (const rock of rocks) {
+                minRockY = Math.min(minRockY, rock.y * CELL);
+                maxRockY = Math.max(maxRockY, (rock.y + 2) * CELL);
+                minRockX = Math.min(minRockX, rock.x * CELL);
+                maxRockX = Math.max(maxRockX, (rock.x + 2) * CELL);
+            }
+            for (const slate of slates) {
+                minRockY = Math.min(minRockY, slate.y);
+                maxRockY = Math.max(maxRockY, slate.y + SLATE_SIZE);
+                minRockX = Math.min(minRockX, slate.x);
+                maxRockX = Math.max(maxRockX, slate.x + SLATE_SIZE);
+            }
+            
+            // TOP - scan from rocks upward to find safe position
+            let placed = false;
+            for (let y = minRockY - textHeight - margin; y >= margin; y--) {
+                const x = (canvas.width - textWidth) / 2;
+                if (textAreaInBuildable(x, y, textWidth, textHeight) &&
+                    !overlapsContent(x, y, textWidth, textHeight)) {
+                    drawWatermarkText(x, y + textHeight/2, 0);
+                    placed = true;
+                    break;
+                }
+            }
+            if (!placed) {
+                // Fallback: place at top edge of buildable area
+                for (let y = margin; y < canvas.height / 3; y++) {
+                    const x = (canvas.width - textWidth) / 2;
+                    if (textAreaInBuildable(x, y, textWidth, textHeight) &&
+                        !overlapsContent(x, y, textWidth, textHeight)) {
+                        drawWatermarkText(x, y + textHeight/2, 0);
+                        break;
+                    }
+                }
+            }
+            
+            // BOTTOM - scan from rocks downward
+            placed = false;
+            for (let y = maxRockY + margin; y < canvas.height - textHeight - margin; y++) {
+                const x = (canvas.width - textWidth) / 2;
+                if (textAreaInBuildable(x, y, textWidth, textHeight) &&
+                    !overlapsContent(x, y, textWidth, textHeight)) {
+                    drawWatermarkText(x, y + textHeight/2, 0);
+                    placed = true;
+                    break;
+                }
+            }
+            if (!placed) {
+                // Fallback
+                for (let y = canvas.height - textHeight - margin; y > canvas.height * 2/3; y--) {
+                    const x = (canvas.width - textWidth) / 2;
+                    if (textAreaInBuildable(x, y, textWidth, textHeight) &&
+                        !overlapsContent(x, y, textWidth, textHeight)) {
+                        drawWatermarkText(x, y + textHeight/2, 0);
+                        break;
+                    }
+                }
+            }
+            
+            // LEFT - scan from rocks leftward (rotated text)
+            placed = false;
+            for (let x = minRockX - textHeight - margin; x >= margin; x--) {
+                const y = canvas.height / 2 - textWidth / 2;
+                if (textAreaInBuildable(x, y, textHeight, textWidth) &&
+                    !overlapsContent(x, y, textHeight, textWidth)) {
+                    drawWatermarkText(x + textHeight/2, y + textWidth, -Math.PI / 2);
+                    placed = true;
+                    break;
+                }
+            }
+            if (!placed) {
+                for (let x = margin; x < canvas.width / 3; x++) {
+                    const y = canvas.height / 2 - textWidth / 2;
+                    if (textAreaInBuildable(x, y, textHeight, textWidth) &&
+                        !overlapsContent(x, y, textHeight, textWidth)) {
+                        drawWatermarkText(x + textHeight/2, y + textWidth, -Math.PI / 2);
+                        break;
+                    }
+                }
+            }
+            
+            // RIGHT - scan from rocks rightward (rotated text)
+            placed = false;
+            for (let x = maxRockX + margin; x < canvas.width - textHeight - margin; x++) {
+                const y = canvas.height / 2 - textWidth / 2;
+                if (textAreaInBuildable(x, y, textHeight, textWidth) &&
+                    !overlapsContent(x, y, textHeight, textWidth)) {
+                    drawWatermarkText(x + textHeight/2, y + textWidth, -Math.PI / 2);
+                    placed = true;
+                    break;
+                }
+            }
+            if (!placed) {
+                for (let x = canvas.width - textHeight - margin; x > canvas.width * 2/3; x--) {
+                    const y = canvas.height / 2 - textWidth / 2;
+                    if (textAreaInBuildable(x, y, textHeight, textWidth) &&
+                        !overlapsContent(x, y, textHeight, textWidth)) {
+                        drawWatermarkText(x + textHeight/2, y + textWidth, -Math.PI / 2);
+                        break;
+                    }
+                }
+            }
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = 'gemtd.top-maze.png';
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
+            
+            // Restore hover
+            hoverX = tempHoverX;
+            hoverY = tempHoverY;
+            render();
+        });
+        
+        // Export JSON functionality
+        document.getElementById('exportJson').addEventListener('click', () => {
+            const data = {
+                version: 1,
+                transform: currentTransform,
+                rocks: originalRocks,
+                slates: originalSlates
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.download = 'gemtd.top-maze.json';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            URL.revokeObjectURL(link.href);
+        });
+        
+        // Import JSON functionality
+        document.getElementById('importJson').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+        
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (data.rocks && Array.isArray(data.rocks)) {
+                        originalRocks = data.rocks;
+                        originalSlates = data.slates || [];
+                        if (data.transform) {
+                            currentTransform = data.transform;
+                            document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+                            document.querySelector(`[data-btn="${currentTransform}"]`).classList.add('active');
+                        }
+                        applyTransform(currentTransform);
+                    }
+                } catch (err) {
+                    alert('Invalid JSON file');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = ''; // Reset file input
+        });
+        
+        // Preset maze dropdown handler
+        document.getElementById('presetSelect').addEventListener('change', (e) => {
+            const jsonPath = e.target.value;
+            if (!jsonPath) return;
+            
+            fetch(jsonPath)
+                .then(response => {
+                    if (!response.ok) throw new Error('File not found');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.rocks && Array.isArray(data.rocks)) {
+                        originalRocks = data.rocks;
+                        originalSlates = data.slates || [];
+                        if (data.transform) {
+                            currentTransform = data.transform;
+                            document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+                            document.querySelector(`[data-btn="${currentTransform}"]`).classList.add('active');
+                        }
+                        applyTransform(currentTransform);
+                    }
+                })
+                .catch(err => {
+                    alert('Could not load maze: ' + err.message);
+                });
+        });
+        
+        // Clear Maze button handler
+        document.getElementById('clearMaze').addEventListener('click', () => {
+            originalRocks = [];
+            originalSlates = [];
+            rocks = [];
+            slates = [];
+            render();
+            document.getElementById('presetSelect').value = '/json/gemtd.top-clear.json';
+        });
+    </script>
+</body>
+</html>
