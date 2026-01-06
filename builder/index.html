@@ -29,30 +29,37 @@
         .btn {
             width: 40px;
             height: 50px;
-            background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
-            border: 2px solid #666;
+            background: linear-gradient(180deg, #4a4a5a 0%, #2a2a3a 100%);
+            border: 2px solid #555;
             border-radius: 6px;
-            color: #fff;
-            font-size: 18px;
-            font-weight: bold;
+            padding: 4px;
             cursor: pointer;
-            transition: all 0.2s ease;
+        }
+        .btn-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
+        .btn[data-btn="1"] .btn-inner { background: #AF0202; }
+        .btn[data-btn="2"] .btn-inner { background: #002DAE; }
+        .btn[data-btn="3"] .btn-inner { background: #13997B; }
+        .btn[data-btn="4"] .btn-inner { background: #380056; }
+        .btn[data-btn="5"] .btn-inner { background: #CFCD03; color: rgba(0,0,0,0.7); text-shadow: none; }
+        .btn[data-btn="6"] .btn-inner { background: #BD670A; }
+        .btn[data-btn="7"] .btn-inner { background: #189200; }
+        .btn[data-btn="8"] .btn-inner { background: #BA4A8F; }
         .btn:hover {
-            background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%);
             border-color: #888;
-            transform: translateY(-2px);
-        }
-        .btn:active {
-            transform: translateY(0);
-            background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
         }
         .btn.active {
-            background: linear-gradient(180deg, #5a8a5a 0%, #3a6a3a 100%);
-            border-color: #8f8;
+            box-shadow: 0 0 0 2px #ffff00;
         }
         .info-bar {
             display: flex;
@@ -172,6 +179,7 @@
         <select id="presetSelect">
             <option value="">-- Select a maze --</option>
             <option value="/json/gemtd.top-safe-build.json" selected>Safe Build</option>
+            <option value="/json/gemtd.top-xistn.json">Fast by Xistn</option>
             <option value="/json/gemtd.top-fast-and-risky.json">Fast and Risky</option>
             <option value="/json/gemtd.top-clear.json">None (Clear Maze)</option>
         </select>
@@ -197,29 +205,29 @@
         <span class="rock-count">Rocks: <strong id="rockCount">0</strong></span>
         <span class="rock-count">Slates: <strong id="slateCount">0</strong></span>
         <span class="divider"></span>
-        <button class="action-btn" id="exportPic">📷 Picture</button>
+        <button class="action-btn" id="exportPic">📸 Picture</button>
         <button class="action-btn" id="exportJson">💾 Export</button>
         <button class="action-btn" id="importJson">📂 Import</button>
         <input type="file" id="fileInput" accept=".json" style="display: none;">
     </div>
     <div class="buttons">
         <span class="position-label">Position:</span>
-        <button class="btn" data-btn="1">1</button>
-        <button class="btn" data-btn="2">2</button>
-        <button class="btn" data-btn="3">3</button>
-        <button class="btn" data-btn="4">4</button>
-        <button class="btn" data-btn="5">5</button>
-        <button class="btn" data-btn="6">6</button>
-        <button class="btn" data-btn="7">7</button>
-        <button class="btn" data-btn="8">8</button>
+        <button class="btn" data-btn="1"><span class="btn-inner">1</span></button>
+        <button class="btn" data-btn="2"><span class="btn-inner">2</span></button>
+        <button class="btn" data-btn="3"><span class="btn-inner">3</span></button>
+        <button class="btn" data-btn="4"><span class="btn-inner">4</span></button>
+        <button class="btn" data-btn="5"><span class="btn-inner">5</span></button>
+        <button class="btn" data-btn="6"><span class="btn-inner">6</span></button>
+        <button class="btn" data-btn="7"><span class="btn-inner">7</span></button>
+        <button class="btn" data-btn="8"><span class="btn-inner">8</span></button>
     </div>
     <div class="instructions">
         <p><strong>How to use:</strong></p>
-        <p>🪨 <strong>Click</strong> on white/green areas to place mazing rocks (click again to remove)</p>
-        <p>🎯 <strong>Drag</strong> slate icons onto the map to mark positions (drag placed slates to move them)</p>
-        <p>🔄 <strong>Buttons 1-8</strong> rotate/flip the maze view for different spawn positions</p>
+        <p>👆 <strong>Click</strong> on white/green areas to place mazing rocks (click again to remove)</p>
+        <p>🖱 <strong>Drag</strong> slate icons onto the map to mark positions (drag placed slates to move them)</p>
+        <p>🔢 <strong>Buttons 1-8</strong> rotate/flip the maze view for different spawn positions</p>
         <p>💾 <strong>Export/Import</strong> JSON to save and load your maze designs</p>
-        <p>📷 <strong>Export</strong> image to download your maze as a PNG</p>
+        <p>📸 <strong>Export</strong> image to download your maze as a PNG</p>
     </div>
     
     <script>
