@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gem TD Builder</title>
+    <script>
+        // Redirect to homepage if not loaded in iframe from gemtd.top
+        if (window.self === window.top) {
+            window.location.href = 'https://gemtd.top';
+        }
+    </script>
     <style>
         body {
             background: #555;
@@ -171,6 +178,184 @@
         .instructions strong {
             color: #fff;
         }
+
+        .main-container {
+            position: relative;
+        }
+
+        .controls-toggle {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            border: 1px solid #666;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .controls-toggle:hover {
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        .controls-toggle .eye-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .controls-hidden .info-bar,
+        .controls-hidden .instructions {
+            display: none !important;
+        }
+
+        .controls-hidden .position-label {
+            display: none !important;
+        }
+
+        .controls-hidden .buttons {
+            margin-top: 0;
+        }
+
+        .controls-hidden .main-container canvas {
+            pointer-events: none;
+        }
+
+        .canvas-wrapper {
+            overflow: hidden;
+        }
+
+        .controls-hidden .canvas-wrapper {
+            touch-action: pan-y pinch-zoom;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 700px) {
+            body {
+                min-height: auto;
+                padding: 5px;
+                box-sizing: border-box;
+                justify-content: flex-start;
+            }
+
+            .main-container {
+                width: 100%;
+            }
+
+            canvas {
+                width: calc(100vw - 10px) !important;
+                height: calc(100vw - 10px) !important;
+            }
+
+            .preset-bar {
+                flex-wrap: wrap;
+                padding: 8px 10px;
+                margin-bottom: 8px;
+                gap: 6px;
+            }
+
+            .preset-bar label {
+                font-size: 12px;
+                width: 100%;
+                text-align: center;
+            }
+
+            .preset-bar select {
+                min-width: 140px;
+                padding: 6px 8px;
+                font-size: 12px;
+                flex: 1;
+            }
+
+            .preset-bar .action-btn {
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+
+            .buttons {
+                flex-wrap: wrap;
+                gap: 4px;
+                margin-top: 8px;
+                justify-content: center;
+            }
+
+            .position-label {
+                width: 100%;
+                text-align: center;
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+
+            .btn {
+                width: 32px;
+                height: 40px;
+            }
+
+            .btn-inner {
+                font-size: 14px;
+            }
+
+            .info-bar {
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-top: 8px;
+                padding: 8px 10px;
+                justify-content: center;
+            }
+
+            .slate-box {
+                width: 28px;
+                height: 28px;
+            }
+
+            .slate-box img {
+                width: 22px;
+                height: 22px;
+            }
+
+            .rock-count {
+                font-size: 12px;
+            }
+
+            .rock-count strong {
+                font-size: 14px;
+            }
+
+            .action-btn {
+                padding: 5px 8px;
+                font-size: 11px;
+            }
+
+            .divider {
+                display: none;
+            }
+
+            .instructions {
+                margin-top: 8px;
+                padding: 10px;
+                max-width: 100%;
+            }
+
+            .instructions p {
+                font-size: 11px;
+                margin: 3px 0;
+            }
+
+            .controls-toggle {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+
+            .controls-toggle .eye-icon {
+                width: 14px;
+                height: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -186,7 +371,21 @@
         <button class="action-btn" id="clearMaze">🗑️ Clear Maze</button>
     </div>
     <div class="main-container">
-        <canvas id="map" width="650" height="650"></canvas>
+        <div class="canvas-wrapper" id="canvasWrapper">
+            <canvas id="map" width="650" height="650"></canvas>
+        </div>
+        <button class="controls-toggle" id="controlsToggle">
+            <svg class="eye-icon eye-slash" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/>
+                <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+                <path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z"/>
+            </svg>
+            <svg class="eye-icon eye-open" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="display:none;">
+                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+            </svg>
+            <span class="toggle-text">Hide Controls</span>
+        </button>
     </div>
     <div class="info-bar">
         <div class="slate-box" data-slate="ancient">
@@ -900,6 +1099,136 @@
         
         // Set button 1 as active initially
         document.querySelector('[data-btn="1"]').classList.add('active');
+
+        // Touch support for mobile
+        function getTouchPos(touch) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: (touch.clientX - rect.left) * scaleX,
+                y: (touch.clientY - rect.top) * scaleY
+            };
+        }
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const pos = getTouchPos(touch);
+            const mouseX = pos.x;
+            const mouseY = pos.y;
+
+            // Check if touching an existing slate
+            for (let i = slates.length - 1; i >= 0; i--) {
+                const slate = slates[i];
+                if (mouseX >= slate.x && mouseX < slate.x + SLATE_SIZE &&
+                    mouseY >= slate.y && mouseY < slate.y + SLATE_SIZE) {
+
+                    draggingSlate = {
+                        type: slate.type,
+                        isNew: false,
+                        originalIndex: i
+                    };
+                    dragOffsetX = mouseX - slate.x;
+                    dragOffsetY = mouseY - slate.y;
+
+                    const origIdx = originalSlates.findIndex(os => {
+                        const transformed = transformSlate(os, currentTransform);
+                        return Math.abs(transformed.x - slate.x) < 1 && Math.abs(transformed.y - slate.y) < 1;
+                    });
+                    if (origIdx >= 0) {
+                        originalSlates.splice(origIdx, 1);
+                    }
+                    slates.splice(i, 1);
+                    render();
+                    return;
+                }
+            }
+
+            // Otherwise handle as rock placement
+            const clickX = Math.floor(mouseX / CELL);
+            const clickY = Math.floor(mouseY / CELL);
+            const existingRockIndex = getRockAtPosition(clickX, clickY);
+
+            if (existingRockIndex >= 0) {
+                const originalRockIndex = originalRocks.findIndex(or => {
+                    const transformed = transformRock(or, currentTransform);
+                    return transformed.x === rocks[existingRockIndex].x &&
+                           transformed.y === rocks[existingRockIndex].y;
+                });
+                if (originalRockIndex >= 0) {
+                    originalRocks.splice(originalRockIndex, 1);
+                }
+                rocks.splice(existingRockIndex, 1);
+                render();
+            } else if (canPlaceRock(clickX, clickY)) {
+                const originalPos = reverseTransformRock({ x: clickX, y: clickY }, currentTransform);
+                originalRocks.push(originalPos);
+                rocks.push({ x: clickX, y: clickY });
+                render();
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const pos = getTouchPos(touch);
+
+            if (draggingSlate) {
+                // Update dragging slate position visual feedback could go here
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            if (draggingSlate) {
+                const touch = e.changedTouches[0];
+                const pos = getTouchPos(touch);
+                const dropX = pos.x - SLATE_SIZE/2;
+                const dropY = pos.y - SLATE_SIZE/2;
+
+                if (dropX >= 0 && dropX <= SIZE * CELL - SLATE_SIZE &&
+                    dropY >= 0 && dropY <= SIZE * CELL - SLATE_SIZE) {
+                    const newSlate = { x: dropX, y: dropY, type: draggingSlate.type };
+                    slates.push(newSlate);
+                    const originalPos = reverseTransformSlate(newSlate, currentTransform);
+                    originalSlates.push(originalPos);
+                    render();
+                }
+                draggingSlate = null;
+            }
+        });
+
+        // Touch support for slate boxes
+        document.querySelectorAll('.slate-box').forEach(box => {
+            box.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                draggingSlate = {
+                    type: box.dataset.slate,
+                    isNew: true
+                };
+            }, { passive: false });
+
+            box.addEventListener('touchend', (e) => {
+                if (draggingSlate && draggingSlate.isNew) {
+                    const touch = e.changedTouches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    const scaleX = canvas.width / rect.width;
+                    const scaleY = canvas.height / rect.height;
+                    const dropX = (touch.clientX - rect.left) * scaleX - SLATE_SIZE/2;
+                    const dropY = (touch.clientY - rect.top) * scaleY - SLATE_SIZE/2;
+
+                    if (dropX >= 0 && dropX <= SIZE * CELL - SLATE_SIZE &&
+                        dropY >= 0 && dropY <= SIZE * CELL - SLATE_SIZE) {
+                        const newSlate = { x: dropX, y: dropY, type: draggingSlate.type };
+                        slates.push(newSlate);
+                        const originalPos = reverseTransformSlate(newSlate, currentTransform);
+                        originalSlates.push(originalPos);
+                        render();
+                    }
+                    draggingSlate = null;
+                }
+            });
+        });
         
         // Load Safe Build preset on page load
         window.addEventListener('load', () => {
@@ -1221,6 +1550,136 @@
             slates = [];
             render();
             document.getElementById('presetSelect').value = '/json/gemtd.top-clear.json';
+        });
+
+        // Send height to parent iframe on mobile
+        function sendHeightToParent() {
+            if (window.innerWidth <= 700 && window.parent !== window) {
+                const height = document.body.scrollHeight;
+                window.parent.postMessage({ type: 'builderHeight', height: height }, '*');
+            }
+        }
+
+        // Controls toggle functionality
+        const controlsToggle = document.getElementById('controlsToggle');
+        const eyeSlash = controlsToggle.querySelector('.eye-slash');
+        const eyeOpen = controlsToggle.querySelector('.eye-open');
+        const toggleText = controlsToggle.querySelector('.toggle-text');
+
+        controlsToggle.addEventListener('click', () => {
+            document.body.classList.toggle('controls-hidden');
+            const isHidden = document.body.classList.contains('controls-hidden');
+
+            if (isHidden) {
+                eyeSlash.style.display = 'none';
+                eyeOpen.style.display = 'block';
+                toggleText.textContent = 'Show Controls';
+            } else {
+                eyeSlash.style.display = 'block';
+                eyeOpen.style.display = 'none';
+                toggleText.textContent = 'Hide Controls';
+            }
+
+            // Send updated height to parent
+            setTimeout(sendHeightToParent, 50);
+        });
+
+        // Hide controls by default on mobile
+        function initMobileState() {
+            if (window.innerWidth <= 700) {
+                document.body.classList.add('controls-hidden');
+                eyeSlash.style.display = 'none';
+                eyeOpen.style.display = 'block';
+                toggleText.textContent = 'Show Controls';
+            }
+        }
+        initMobileState();
+
+        // Run on load and resize
+        window.addEventListener('load', () => {
+            setTimeout(sendHeightToParent, 100);
+        });
+        window.addEventListener('resize', sendHeightToParent);
+
+        // Pinch-to-zoom and pan functionality (mobile only, when controls hidden)
+        const canvasWrapper = document.getElementById('canvasWrapper');
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let lastTouchDistance = 0;
+        let lastTouchCenter = { x: 0, y: 0 };
+        let isPinching = false;
+
+        function updateCanvasTransform() {
+            canvas.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            canvas.style.transformOrigin = 'center center';
+        }
+
+        function resetCanvasTransform() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            updateCanvasTransform();
+        }
+
+        function getTouchDistance(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function getTouchCenter(touches) {
+            return {
+                x: (touches[0].clientX + touches[1].clientX) / 2,
+                y: (touches[0].clientY + touches[1].clientY) / 2
+            };
+        }
+
+        canvasWrapper.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                isPinching = true;
+                lastTouchDistance = getTouchDistance(e.touches);
+                lastTouchCenter = getTouchCenter(e.touches);
+            }
+        }, { passive: false });
+
+        canvasWrapper.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && isPinching) {
+                e.preventDefault();
+
+                // Pinch zoom
+                const newDistance = getTouchDistance(e.touches);
+                const scaleChange = newDistance / lastTouchDistance;
+                const newScale = Math.min(Math.max(scale * scaleChange, 0.5), 4);
+
+                // Pan
+                const newCenter = getTouchCenter(e.touches);
+                const deltaX = newCenter.x - lastTouchCenter.x;
+                const deltaY = newCenter.y - lastTouchCenter.y;
+
+                translateX += deltaX;
+                translateY += deltaY;
+                scale = newScale;
+
+                updateCanvasTransform();
+
+                lastTouchDistance = newDistance;
+                lastTouchCenter = newCenter;
+            }
+        }, { passive: false });
+
+        canvasWrapper.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) {
+                isPinching = false;
+            }
+        });
+
+        // Reset zoom when controls are shown
+        controlsToggle.addEventListener('click', () => {
+            if (!document.body.classList.contains('controls-hidden')) {
+                resetCanvasTransform();
+            }
         });
     </script>
 </body>

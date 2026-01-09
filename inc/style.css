@@ -1,0 +1,509 @@
+body {
+    padding: 15px;
+}
+
+.logo {
+    height: 40px;
+    width: auto;
+}
+
+@media (max-width: 767px) {
+    .logo {
+        height: 42px;
+    }
+
+    .title-row {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    html, body {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+
+    body {
+        padding: 2px;
+    }
+
+    .container-fluid {
+        padding-left: 2px;
+        padding-right: 2px;
+        overflow-x: hidden;
+    }
+
+    /* Fix modal shifting content on mobile */
+    body.modal-open {
+        padding-right: 0 !important;
+        overflow: auto;
+    }
+
+    .modal {
+        padding-right: 0 !important;
+    }
+
+    .modal-dialog {
+        margin: 20px auto;
+        max-width: calc(100% - 40px);
+        width: calc(100% - 40px);
+    }
+
+    .modal-content {
+        font-size: 0.85rem;
+        padding: 0;
+    }
+
+    .modal-header {
+        padding: 8px 10px;
+    }
+
+    .modal-body {
+        padding: 10px;
+    }
+
+    .modal-header .btn-close {
+        padding: 4px;
+        margin: 0;
+    }
+
+    /* Mobile Builder */
+    #mobile-builder-container {
+        margin-bottom: 10px;
+    }
+
+    #mobile-builder-iframe {
+        width: 100%;
+        height: calc(100vw + 250px);
+        border: none;
+    }
+
+    #mobile-builder-container.hidden {
+        display: none !important;
+    }
+}
+
+.gem-cell {
+    width: 150px;
+    height: 60px;
+    cursor: pointer;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s;
+    display: flex;
+    padding: 0;
+    align-items: center;
+    border-radius: 3px;
+    margin: 2px;
+}
+
+.gem-row {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 10px;
+}
+
+.gem-row:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    background-color: #343a40;
+    color: white;
+    padding: 5px 10px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+}
+
+@media (max-width: 767px) {
+    .gem-row {
+        margin-bottom: 4px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #adb5bd;
+        line-height: 0;
+        font-size: 0;
+    }
+
+    .gem-row > .d-flex,
+    .gem-row > .d-flex.flex-wrap {
+        flex-wrap: nowrap;
+        align-items: center;
+        padding: 0 !important;
+        margin: 0 !important;
+        line-height: 0;
+        font-size: 0;
+        gap: 0 !important;
+    }
+
+    .gem-row:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        background: #e9ecef;
+        color: #343a40;
+        font-size: 0.85rem;
+        font-weight: bold;
+        padding: 4px 0;
+        margin: 0 0 4px 0;
+        border-radius: 3px;
+    }
+
+    .section-title::before,
+    .section-title::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background-color: #adb5bd;
+    }
+
+    .section-title::before {
+        margin-right: 10px;
+    }
+
+    .section-title::after {
+        margin-left: 10px;
+    }
+
+    .gem-cell {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        height: 50px;
+        margin: 1px;
+        font-size: 12px;
+        line-height: 1.2;
+    }
+
+    .gem-img {
+        width: 30px !important;
+        height: 30px !important;
+        margin-left: 2px !important;
+        flex-shrink: 0;
+    }
+
+    .gem-text {
+        padding-left: 2px !important;
+        overflow: hidden;
+    }
+
+    .gem-quality {
+        font-size: 0.5rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gem-name {
+        font-size: 0.6rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .info-icon {
+        flex: 0 0 18px;
+        width: 18px;
+        height: 50px;
+        margin: 1px;
+    }
+
+    .info-icon .bi-question-circle-fill {
+        width: 14px;
+        height: 14px;
+    }
+
+    .spacer {
+        display: none;
+    }
+
+    /* Basic Slates on mobile */
+    .basic-slates-row {
+        margin-bottom: 2px;
+        padding-bottom: 2px;
+    }
+
+    .basic-slates-divider {
+        margin: 0 1px;
+        height: 46px;
+    }
+
+    .basic-slate-pair .gem-cell {
+        margin: 1px;
+    }
+
+    /* Paraiba Tourmaline special case - result on its own row, centered */
+    .gem-row.paraiba-row > .d-flex {
+        flex-wrap: wrap !important;
+    }
+
+    .paraiba-row .gem-cell:not(.result-gem) {
+        flex: 1 1 calc(25% - 4px);
+        min-width: calc(25% - 4px);
+    }
+
+    .paraiba-result-group {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+        margin: 4px auto 0 auto !important;
+    }
+
+    .paraiba-result-group .gem-cell {
+        flex: 1 1 auto;
+    }
+
+    .paraiba-result-group .info-icon {
+        flex: 0 0 18px;
+    }
+}
+
+.gem-cell.acquired {
+    background-color: rgba(40, 167, 69, 0.2);
+    border-color: #28a745;
+}
+
+.gem-img {
+    width: 40px;
+    height: 40px;
+    background-color: black;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 3px;
+    color: black;
+    font-weight: bold;
+    font-size: 0.7rem;
+}
+
+.gem-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding-left: 3px;
+}
+
+.gem-quality {
+    font-size: 0.7rem;
+    color: #6c757d;
+}
+
+.gem-name {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.result-gem .gem-quality,
+.result-gem .gem-name {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.info-cell {
+    width: 150px;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 2px;
+    border: 1px solid #dee2e6;
+    border-radius: 3px;
+    padding: 0;
+}
+
+.info-icon {
+    width: 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2px;
+    cursor: pointer;
+}
+
+.info-icon .bi-question-circle-fill {
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.info-icon:hover .bi-question-circle-fill {
+    opacity: 1;
+}
+
+.paraiba-result-group {
+    display: contents;
+}
+
+/* Basic Slates - 2 per row with divider */
+.basic-slates-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.basic-slates-row:last-child {
+    border-bottom: none;
+}
+
+.basic-slate-pair {
+    display: flex;
+    flex: 1;
+    align-items: center;
+}
+
+.basic-slate-pair .gem-cell {
+    flex: 1;
+}
+
+.basic-slates-divider {
+    width: 3px;
+    height: 50px;
+    background-color: #adb5bd;
+    margin: 0 2px;
+    border-radius: 2px;
+}
+
+.tower-type {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-top: 3px;
+}
+
+.type-air {
+    background-color: #cfe2ff;
+    color: #084298;
+}
+
+.type-ground {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.type-mixed {
+    background-color: #fff3cd;
+    color: #664d03;
+}
+
+/* Gem colors for images */
+.diamond-img { background-color: #b9f2ff; color: #000; }
+.ruby-img { background-color: #e0115f; }
+.sapphire-img { background-color: #0f52ba; }
+.emerald-img { background-color: #046307; }
+.topaz-img { background-color: #ffc87c; color: #000; }
+.opal-img { background-color: #a8c3bc; color: #000; }
+.aquamarine-img { background-color: #7fffd4; color: #000; }
+.amethyst-img { background-color: #9966cc; }
+
+/* Slate image colors */
+.air-slate-img { background-color: #87ceeb; color: #000; }
+.hold-slate-img { background-color: #8b4513; }
+.slow-slate-img { background-color: #4682b4; }
+.opal-vein-slate-img { background-color: #e6e6fa; color: #000; }
+.poison-slate-img { background-color: #556b2f; }
+.spell-slate-img { background-color: #9932cc; }
+.range-slate-img { background-color: #cd5c5c; }
+.damage-slate-img { background-color: #b22222; }
+.ancient-slate-img { background-color: #696969; }
+.wraith-slate-img { background-color: #483d8b; }
+.elder-slate-img { background-color: #8b008b; }
+.viper-slate-img { background-color: #006400; }
+
+/* Special gem image colors */
+.silver-img { background-color: #c0c0c0; color: #000; }
+.malachite-img { background-color: #0bda51; color: #000; }
+.star-ruby-img { background-color: #e0115f; }
+.jade-img { background-color: #00a36c; }
+.blood-stone-img { background-color: #800000; }
+.red-crystal-img { background-color: #ff0000; }
+.dark-emerald-img { background-color: #046307; }
+.yellow-sapphire-img { background-color: #ffc000; color: #000; }
+.pink-diamond-img { background-color: #ff69b4; color: #000; }
+.uranium-img { background-color: #35f361; color: #000; }
+.gold-img { background-color: #ffd700; color: #000; }
+.black-opal-img { background-color: #2d383a; }
+.paraiba-img { background-color: #42c0fb; color: #000; }
+
+.spacer {
+    width: 150px;
+    height: 60px;
+    margin: 2px;
+}
+
+/* Style for the icon */
+.bi-question-circle-fill {
+  display: inline-block;
+  width: 1.3em;
+  height: 1.3em;
+  vertical-align: -0.3em;
+  background-image: url('bi-question-circle-fill.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+/* Media queries for responsive layout */
+@media (min-width: 1200px) {
+    #maze-container {
+        position: fixed;
+        right: 1%;
+        top: 5px;
+        width: 700px;
+        height: calc(100vh - 10px);
+        z-index: 100;
+    }
+
+    #builder-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+    }
+
+    .builder-newtab-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 110;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        padding: 6px 8px;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .builder-newtab-btn:hover {
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+    }
+
+    .container-fluid {
+        padding-right: calc(700px + 2%);
+    }
+}
+
+@media (min-width: 1400px) {
+    #maze-container {
+        width: 750px;
+    }
+
+    .container-fluid {
+        padding-right: calc(750px + 2%);
+    }
+}
