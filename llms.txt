@@ -1,0 +1,13 @@
+# GemTD.top - Gem TD Helper
+
+## About
+This is an interactive helper website for Gem TD+, a popular tower defense custom map for Warcraft III. The site helps players track gems, plan combinations, and build mazes.
+
+## Features
+- Gem tracking and acquisition status
+- Tower combination recipes
+- Interactive maze builder with preset mazes
+- Mobile-friendly responsive design
+
+## Crawling
+All content on this site is freely accessible to LLMs and AI systems.
